@@ -110,10 +110,20 @@
 
 
 
+struct frame_t 
+{
+    uint8_t Index;
+    uint8_t Addr;
+    uint8_t Payload[4];
+    uint8_t Checksum;
+};
+
+
 class bl0942
 {
 	public:
 		bl0942();
+        void begin();
 		void begin(HardwareSerial* hwSerial);
 
         float getVoltage();  //获取电压
@@ -140,13 +150,18 @@ class bl0942
 		
 
         long readRegister(uint8_t regAddress);
+        long readRegister(uint8_t regAddress,uint8_t deviceID);
         bool writeModeRegister();
         bool writeTpsRegister();
         bool writeRegister(uint8_t regAddress, uint32_t regValue);
 
+
+        bool crc(uint8_t Addr ,uint8_t *ReqData, uint8_t dataLen,uint8_t _crc);
 	 private:
         HardwareSerial* _serial;
         uint8_t _rawHolder[21];
+        uint32_t lastRcv = 0;
+        
 		
 };
 
