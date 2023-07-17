@@ -17,12 +17,23 @@ void bl0942::begin()
 
 //获取电力数据
 
+float bl0942::getVoltage()  //获取电压
+{
+    uint8_t Addr = 0x04;
+    uint32_t get_reg_data = readRegister(Addr);
+    float Data =  get_reg_data * BL0942_VREF / BL0942_V_RMS_LBS;
+    Data =  BL0942_V_R1 / BL0942_V_R2 * Data / 1000.0;
+    return Data;
+}
+
+
 
 float bl0942::getFrequency()  //获取频率
 {
     uint8_t Addr = 0x08;
     long get_reg_data = readRegister(Addr);
-    float Data = 2.0 * 500000 / get_reg_data;
+    float Data = 2.0 * 500000 / get_reg_data;  //ADC管脚电压  mv
+    
     return Data;
 }
 
