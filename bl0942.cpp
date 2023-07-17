@@ -28,6 +28,17 @@ float bl0942::getVoltage()  //获取电压
 
 
 
+float bl0942::getCurrent()   //获取电流() 
+{
+    uint8_t Addr = 0x03;
+    uint32_t get_reg_data = readRegister(Addr);
+    float Data =  get_reg_data * BL0942_VREF / BL0942_I_RMS_LBS;
+    Data =  Data / BL0942_I_R1 * 2000; // 
+    return Data;
+}
+
+
+
 float bl0942::getFrequency()  //获取频率
 {
     uint8_t Addr = 0x08;
