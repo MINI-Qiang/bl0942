@@ -129,14 +129,10 @@ class bl0942
         float getVoltage();  //获取电压
         float getCurrent();   //获取电流
         float getActivePower();  //有功功率
-        float getReactivePower();  //无功功率
-        float getApparentPower();   //视在功率
         float getEnergy();      //总功率
         float getEnergy(uint32_t cf);
-        float getEnergyDelta();    //功率增量
-        float getPhaseAngle();     //相位角
-        float getPowerFactor(bool percentage=true);   //功率因数
-        float getTemperature();    //温度
+        float getFrequency();  //获取频率
+     
 		
 		/*
 		void setRMSUpdate(uint8_t val = BL0942_RMS_REG_UPDATE_RATE_400MS);

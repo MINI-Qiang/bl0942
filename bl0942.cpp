@@ -14,6 +14,22 @@ void bl0942::begin()
 {
 }
 
+
+//获取电力数据
+
+
+float bl0942::getFrequency()  //获取频率
+{
+    uint8_t Addr = 0x08;
+    long get_reg_data = readRegister(Addr);
+    float Data = 2.0 * 500000 / get_reg_data;
+    return Data;
+}
+
+
+
+
+
 long bl0942::readRegister(uint8_t regAddress)
 {
     lastRcv = millis(); // 记录超时时间
@@ -59,17 +75,9 @@ long bl0942::readRegister(uint8_t regAddress)
         return 0;
     }
     
-   
-    Serial.print(Payload[0],HEX);
-    Serial.print(",");
-    Serial.print(Payload[1],HEX);
-    Serial.print(",");
-    Serial.print(Payload[2],HEX);
-    Serial.print(",");
-    Serial.print(Payload[3],HEX);
-    Serial.println();
-    
-    return Payload[0];
+    // 数据处理成整数输出
+    long Data = ((uint32_t)Payload[2] << 16) + ((uint32_t)Payload[1] << 8) + (uint32_t)Payload[0];
+    return Data;
 }
 
 
