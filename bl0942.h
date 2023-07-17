@@ -10,6 +10,10 @@
 #define BL0942_V_R1  110000
 #define BL0942_V_R2  28.7
 
+#define BL0942_I_RMS_LBS 305978
+#define BL0942_I_R1  10
+
+
 
 #define BL0942_TIMEOUT                     50
 #define BL0942_DEFAULT_BAUD_RATE            4800
