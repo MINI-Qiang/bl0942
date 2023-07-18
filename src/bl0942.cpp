@@ -7,7 +7,7 @@ bl0942::bl0942()
 void bl0942::begin(HardwareSerial *hwSerial)
 {
     _serial = hwSerial;
-    _serial->begin(4800);
+    _serial->begin(BL0942_DEFAULT_BAUD_RATE,BL0942_DEFAULT_PORT_CONFIG);
 }
 
 void bl0942::begin()

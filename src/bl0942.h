@@ -54,17 +54,6 @@ class bl0942
         uint8_t WA_CREEP();
      
 		
-		/*
-		void setRMSUpdate(uint8_t val = BL0942_RMS_REG_UPDATE_RATE_400MS);
-        void setACFrequency(uint8_t val = BL0942_AC_FREQ_50HZ);
-        void setCFPinMode(uint8_t val = BL0942_CF_ENERGY_PULSE);
-        void setTSwitch(uint8_t val = BL0942_TEMPERATUTE_CTRL_ON);
-        void setASwitch(uint8_t val = BL0942_TEMPERATURE_ALARM_ON);
-        void setTSelector(uint8_t val = BL0942_TEMPERATURE_AUTO);
-        void setTInterval(uint8_t val = BL0942_TEMPERATURE_INTERVAL_100MS);
-		*/
-		
-
         long readRegister(uint8_t regAddress);
         long readRegister(uint8_t regAddress,uint8_t deviceID);
         bool writeModeRegister();
