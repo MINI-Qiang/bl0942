@@ -50,6 +50,8 @@ class bl0942
         float getEnergy();      //总功率
         float getEnergy(uint32_t cf);
         float getFrequency();  //获取频率
+
+        uint8_t WA_CREEP();
      
 		
 		/*
@@ -76,6 +78,7 @@ class bl0942
         HardwareSerial* _serial;
         uint8_t _rawHolder[21];
         uint32_t lastRcv = 0;
+        uint32_t V_RMS_ADC = 0;
         uint32_t I_RMS_ADC = 0;
         int32_t  W_RMS_ADC = 0;
         uint32_t W_CF_CNT = 0;
