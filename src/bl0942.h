@@ -9,7 +9,7 @@
 
 #define BL0942_V_RMS_LBS 73989
 #define BL0942_V_R1  110000
-#define BL0942_V_R2  28.7    
+#define BL0942_V_R2  28.7   
 
 #define BL0942_I_RMS_LBS 305978
 #define BL0942_I_R1  2      //电流采样系数
@@ -78,6 +78,7 @@ class bl0942
         uint32_t lastRcv = 0;
         uint32_t I_RMS_ADC = 0;
         int32_t  W_RMS_ADC = 0;
+        uint32_t W_CF_CNT = 0;
 		
 };
 

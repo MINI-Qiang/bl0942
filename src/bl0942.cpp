@@ -78,7 +78,15 @@ float bl0942::getEnergy()      //总功率
     uint8_t Addr = 0x07;
     uint32_t get_reg_data = readRegister(Addr);
 
-    // float Data =  (1638.4 * 256 * BL0942_VREF * BL0942_VREF * BL0942_V_R1) / (3600000* 3537 * (BL0942_I_R1 * 1000 / BL0942_I_Rt) * BL0942_V_R2 * 1000);
+     if(get_reg_data != 0)
+    {
+        W_CF_CNT = get_reg_data;
+    }
+    else
+    {
+        get_reg_data = W_CF_CNT;
+    }
+
     float Data = get_reg_data *  BL0942_CF_CNT;
     return Data;
 }
