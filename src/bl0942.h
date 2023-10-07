@@ -2,6 +2,7 @@
 #define _BL0942_H_
 
 #include "Arduino.h"
+#include "SPI.h"
 
 
 //Electrical parameter register (read only) 
@@ -19,7 +20,7 @@
 #define BL0942_CF_CNT 0.00018729
 
 
-#define BL0942_TIMEOUT                      50
+#define BL0942_TIMEOUT                      200
 #define BL0942_DEFAULT_BAUD_RATE            4800
 #define BL0942_DEFAULT_PORT_CONFIG          SERIAL_8N1
 #define BL0942_DEFAULT_RMS_UPDATE           400
@@ -41,6 +42,7 @@ class bl0942
 {
 	public:
 		bl0942();
+		bl0942(uint8_t cs_io);
         void begin();
 		void begin(HardwareSerial* hwSerial);
 
@@ -55,16 +57,21 @@ class bl0942
      
 		
         long readRegister(uint8_t regAddress);
+		long readRegister_spi(uint8_t regAddress);
         long readRegister(uint8_t regAddress,uint8_t deviceID);
-        bool writeModeRegister();
-        bool writeTpsRegister();
-        bool writeRegister(uint8_t regAddress, uint32_t regValue);
+        //bool writeModeRegister();
+        //bool writeTpsRegister();
+		
+		bool writeRegister_spi(uint8_t regAddress, uint32_t regValue);
+		
+        //bool writeRegister(uint8_t regAddress, uint32_t regValue);
 
-
+		uint8_t crc(uint8_t *ReqData, uint8_t dataLen);
         bool crc(uint8_t Addr ,uint8_t *ReqData, uint8_t dataLen,uint8_t _crc);
 	 private:
         
         HardwareSerial* _serial;
+		uint8_t _cs_io = 0;
         uint8_t _rawHolder[21];
         uint32_t lastRcv = 0;
         uint32_t V_RMS_ADC = 0;

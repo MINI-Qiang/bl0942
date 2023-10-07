@@ -2,6 +2,12 @@
 
 bl0942::bl0942()
 {
+	
+}
+
+bl0942::bl0942(uint8_t cs_io)
+{
+	_cs_io = cs_io;
 }
 
 void bl0942::begin(HardwareSerial *hwSerial)
@@ -10,8 +16,14 @@ void bl0942::begin(HardwareSerial *hwSerial)
     _serial->begin(BL0942_DEFAULT_BAUD_RATE,BL0942_DEFAULT_PORT_CONFIG);
 }
 
+
 void bl0942::begin()
 {
+	if(_cs_io!=0)
+	{
+		SPI.begin(_cs_io);   //cs
+		SPI.beginTransaction(SPISettings(900000, MSBFIRST, SPI_MODE1));
+	}
 }
 
 // 获取电力数据
@@ -108,6 +120,60 @@ uint8_t bl0942::WA_CREEP()
 
 
 
+long bl0942::readRegister_spi(uint8_t regAddress)
+{
+
+    long regValue = 0;
+
+    uint8_t Start = 0x58; // 读指令
+    uint8_t regAddr = regAddress;
+
+    uint8_t Payload[4];
+	//请求数据
+    digitalWrite(_cs_io,LOW);
+	SPI.transfer(Start);
+	SPI.transfer(regAddr);
+	Payload[0] = SPI.transfer(0x00);
+	Payload[1] = SPI.transfer(0x00);
+	Payload[2] = SPI.transfer(0x00);
+	Payload[3] = SPI.transfer(0x00);  //校验位数据
+	digitalWrite(_cs_io,HIGH);
+	
+	//校验数据
+	
+	uint8_t Payload_OUT[5];
+	Payload_OUT[0] = Start;
+	Payload_OUT[1] = regAddr;
+	
+	Payload_OUT[2] = Payload[0];
+	Payload_OUT[3] = Payload[1];
+	Payload_OUT[4] = Payload[2];
+	
+	
+	//计算CRC
+	uint8_t crc_data = crc(Payload_OUT, 5);
+	if (crc_data != Payload[3])
+	{
+		return -1;
+	}
+	
+	/*
+	if (crc(regAddr, Payload, sizeof(Payload), Payload[3]) != true) // 超时返回如果数据不够,则错误返回
+	{
+       return -1;
+    }
+	*/
+    // 数据处理成整数输出
+    long Data = (((uint32_t)Payload[0] << 24) + ((uint32_t)Payload[1] << 16) + ((uint32_t)Payload[2] << 8)) >> 8;
+    //return Data;
+	return (crc_data <<8) + Payload[3];
+}
+
+
+
+
+
+
 
 
 long bl0942::readRegister(uint8_t regAddress)
@@ -144,20 +210,73 @@ long bl0942::readRegister(uint8_t regAddress)
     if (Index != Bytes) // 超时返回如果数据不够,则错误返回
     {
         //_state = BADFRAME_ERR;
-        return 0;
+        return -1;
     }
     // 数据返回
 
     if (crc(regAddr, Payload, sizeof(Payload), Payload[3]) != true) // 超时返回如果数据不够,则错误返回
     {
         //_state = BADFRAME_ERR;
-        return 0;
+        return -1;
     }
 
     // 数据处理成整数输出
     long Data = (((uint32_t)Payload[2] << 24) + ((uint32_t)Payload[1] << 16) + ((uint32_t)Payload[0] << 8)) >> 8;
     return Data;
 }
+
+
+bool bl0942::writeRegister_spi(uint8_t regAddress, uint32_t regValue)
+{
+	//long regValue = 0;
+
+    uint8_t Start = 0xA8; // 写指令
+    uint8_t regAddr = regAddress;
+
+    uint8_t Payload[5];
+	Payload[0] = Start;
+	Payload[1] = regAddr;
+	
+	Payload[2] = regValue>>16;
+	Payload[3] = regValue>>8;
+	Payload[4] = regValue;
+	
+	
+	//计算CRC
+	uint8_t crc_data = crc(Payload, sizeof(Payload));
+	
+	//发送写入
+    digitalWrite(_cs_io,LOW);
+	SPI.transfer(Payload[0]);  //包头
+	SPI.transfer(Payload[1]);   //地址
+	
+	SPI.transfer(Payload[2]);   //数据高位
+	SPI.transfer(Payload[3]);   //数据中位
+	SPI.transfer(Payload[4]);   //数据低位
+	SPI.transfer(crc_data);    //校验值位
+	
+	digitalWrite(_cs_io,HIGH);
+
+    return 1;
+}
+
+
+uint8_t bl0942::crc(uint8_t *ReqData, uint8_t dataLen)
+{
+    // 校验值计算
+    //uint8_t startData = 0x58;
+    uint8_t checkData = 0;
+    for (uint8_t a = 0; a < dataLen; a++)
+    {
+        checkData = checkData + ReqData[a]; // 校验和计算
+    }
+    checkData = 0xff-checkData; // 取反
+   // checkData = ~(checkData& 0xFF); // 取反
+
+	return checkData;
+	
+}
+
 
 bool bl0942::crc(uint8_t Addr, uint8_t *ReqData, uint8_t dataLen, uint8_t _crc)
 {
