@@ -17,7 +17,8 @@
 #define BL0942_I_Rt  2000   //电流环变比
 
 //(1638.4 * 256 * BL0942_VREF * BL0942_VREF * BL0942_V_R1) / (3600000* 3537 * (BL0942_I_R1 * 1000 / BL0942_I_Rt) * BL0942_V_R2 * 1000);
-#define BL0942_CF_CNT 0.00018729
+//#define BL0942_CF_CNT 0.00018729
+#define BL0942_CF_CNT (1638.4 * 256 * BL0942_VREF * BL0942_VREF * BL0942_V_R1) / (3600000.0* 3537.0 * (BL0942_I_R1 * 1000.0 / BL0942_I_Rt) * BL0942_V_R2 * 1000.0)
 
 
 #define BL0942_TIMEOUT                      200
@@ -50,6 +51,7 @@ class bl0942
         float getCurrent();   //获取电流
         float getActivePower();  //有功功率
         float getEnergy();      //总功率
+        uint32_t getEnergyCF();  //获取脉冲数
         float getEnergy(uint32_t cf);
         float getFrequency();  //获取频率
 

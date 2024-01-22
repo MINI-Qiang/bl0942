@@ -22,7 +22,7 @@ void bl0942::begin()
 	if(_cs_io!=0)
 	{
 		SPI.begin(_cs_io);   //cs
-		SPI.beginTransaction(SPISettings(900000, MSBFIRST, SPI_MODE1));
+		SPI.beginTransaction(SPISettings(800000, MSBFIRST, SPI_MODE1));
 	}
 }
 
@@ -103,6 +103,31 @@ float bl0942::getEnergy() // 总功率
     return Data;
 }
 
+//电表计量脉冲
+uint32_t bl0942::getEnergyCF() // 获取脉冲数
+{
+    uint8_t Addr = 0x07;
+    uint32_t get_reg_data = readRegister(Addr);
+
+    if (get_reg_data != 0)
+    {
+        W_CF_CNT = get_reg_data;
+    }
+    else
+    {
+        get_reg_data = W_CF_CNT;
+    }
+
+    return get_reg_data;
+}
+
+float bl0942::getEnergy(uint32_t cf) // 通过脉冲计算电量
+{
+    float Data = cf * BL0942_CF_CNT;
+    return Data;
+}   
+
+
 float bl0942::getFrequency() // 获取频率
 {
     uint8_t Addr = 0x08;
@@ -166,7 +191,7 @@ long bl0942::readRegister_spi(uint8_t regAddress)
     // 数据处理成整数输出
     long Data = (((uint32_t)Payload[0] << 24) + ((uint32_t)Payload[1] << 16) + ((uint32_t)Payload[2] << 8)) >> 8;
     //return Data;
-	return (crc_data <<8) + Payload[3];
+	return Data;
 }
 
 
