@@ -32,7 +32,7 @@ float bl0942::getVoltage() // 获取电压
 {
     uint8_t Addr = 0x04;
     uint32_t get_reg_data = readRegister(Addr);
-    float Data = (get_reg_data * BL0942_VREF * BL0942_V_R1) / (BL0942_V_RMS_LBS * BL0942_V_R2 * 1000);
+    float Data = (get_reg_data * BL0942_VREF * BL0942_V_R1) / (BL0942_V_RMS_LBS * BL0942_V_R2 * 1000.0);
     V_RMS_ADC =Data;
     // float Data =  get_reg_data * BL0942_VREF / BL0942_V_RMS_LBS;
     // Data =  BL0942_V_R1 / BL0942_V_R2 * Data / 1000.0;
@@ -58,7 +58,7 @@ float bl0942::getCurrent() // 获取电流()
         get_reg_data = I_RMS_ADC;
     }
 
-    float Data = (get_reg_data * BL0942_VREF) / (BL0942_I_RMS_LBS * (BL0942_I_R1 * 1000) / BL0942_I_Rt);
+    float Data = (get_reg_data * BL0942_VREF) / (BL0942_I_RMS_LBS * (BL0942_I_R1 * 1000.0) / BL0942_I_Rt);
     // Data =  Data * 2000 / BL0942_I_R1 ;
     return Data;
 }
@@ -81,8 +81,8 @@ float bl0942::getActivePower() // 有功功率
         get_reg_data = W_RMS_ADC;
     }
 
-    float Data = (get_reg_data * BL0942_VREF * BL0942_VREF * BL0942_V_R1) / (3537 * (BL0942_I_R1 * 1000 / BL0942_I_Rt) * BL0942_V_R2 * 1000);
-    return Data;
+    float Data = (get_reg_data * BL0942_VREF * BL0942_VREF * BL0942_V_R1) / (3537.0 * (BL0942_I_R1 * 1000.0 / BL0942_I_Rt) * BL0942_V_R2 * 1000.0);
+    return Data; 
 }
 
 float bl0942::getEnergy() // 总功率
@@ -189,7 +189,13 @@ long bl0942::readRegister_spi(uint8_t regAddress)
     }
 	*/
     // 数据处理成整数输出
-    long Data = (((uint32_t)Payload[0] << 24) + ((uint32_t)Payload[1] << 16) + ((uint32_t)Payload[2] << 8)) >> 8;
+
+    int32_t Data = (int32_t)((uint32_t)Payload[2] << 16 | 
+                          (uint32_t)Payload[1] << 8  | 
+                          (uint32_t)Payload[0]);
+    Data = Data << 8; // 将数据左移8位，将符号位移至32位整数的符号位位置
+    Data = Data >> 8; // 算术右移回来，如果最高位是1，则会正确填充符号位
+    //long Data = (((uint32_t)Payload[0] << 24) + ((uint32_t)Payload[1] << 16) + ((uint32_t)Payload[2] << 8)) >> 8;
     //return Data;
 	return Data;
 }
@@ -246,7 +252,12 @@ long bl0942::readRegister(uint8_t regAddress)
     }
 
     // 数据处理成整数输出
-    long Data = (((uint32_t)Payload[2] << 24) + ((uint32_t)Payload[1] << 16) + ((uint32_t)Payload[0] << 8)) >> 8;
+    int32_t Data = (int32_t)((uint32_t)Payload[2] << 16 | 
+                          (uint32_t)Payload[1] << 8  | 
+                          (uint32_t)Payload[0]);
+    Data = Data << 8; // 将数据左移8位，将符号位移至32位整数的符号位位置
+    Data = Data >> 8; // 算术右移回来，如果最高位是1，则会正确填充符号位
+    //long Data = (((uint32_t)Payload[2] << 24) + ((uint32_t)Payload[1] << 16) + ((uint32_t)Payload[0] << 8)) >> 8;
     return Data;
 }
 
